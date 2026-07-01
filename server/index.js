@@ -27,7 +27,7 @@ app.use(express.json());
 
 // ── Serve Frontend ────────────────────────────────────────
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const clientDistPath = path.join(__dirname, '../client/dist');
+const clientDistPath = path.join(__dirname, '../dist/client');
 app.use(express.static(clientDistPath));
 
 // Health check
