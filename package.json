@@ -1,0 +1,10 @@
+{
+  "name": "brand-grand-prix",
+  "version": "1.0.0",
+  "description": "Multiplayer 3D Racing Game with Ad Tech Integration",
+  "scripts": {
+    "postinstall": "cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && node index.js"
+  }
+}

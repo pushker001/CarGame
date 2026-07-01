@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brand Grand Prix — Multiplayer 3D Racing</title>
+    <meta name="description" content="Free browser-based multiplayer 3D kart racing game. Race real players in real time on a live-branded city circuit." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <!-- Lobby Screen -->
+    <div id="lobby-screen">
+      <div class="lobby-bg"></div>
+      <div class="lobby-content">
+        <div class="logo-wrap">
+          <div class="logo-badge">🏁</div>
+          <h1 class="game-title">Brand Grand Prix</h1>
+          <p class="game-sub">Multiplayer 3D Racing · Live Global</p>
+        </div>
+        <div class="lobby-card">
+          <div class="input-group">
+            <label for="player-name">Your Racing Name</label>
+            <input id="player-name" type="text" maxlength="20" placeholder="Enter racer name…" autocomplete="off" />
+          </div>
+          <button id="join-btn" class="btn-primary">
+            <span class="btn-icon">⚡</span> Join Multiplayer Race
+          </button>
+          <button id="solo-btn" class="btn-solo">
+            <span class="btn-icon">🏎️</span> Practice Solo (Drive Now)
+          </button>
+        </div>
+        <div class="lobby-stats">
+          <div class="stat">
+            <span class="stat-num" id="online-count">—</span>
+            <span class="stat-label">Racers Online</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="waiting-count">—</span>
+            <span class="stat-label">In Lobby</span>
+          </div>
+        </div>
+        <div id="join-feed" class="join-feed"></div>
+      </div>
+    </div>
+
+    <!-- Waiting Overlay -->
+    <div id="waiting-overlay" class="hidden">
+      <div class="waiting-inner">
+        <div class="waiting-icon">⏳</div>
+        <div class="waiting-title">WAITING FOR PLAYERS</div>
+        <div class="waiting-sub">Open another browser tab to start the race!</div>
+        <div class="waiting-sub" style="margin-top:8px;color:#f7b731">or</div>
+        <button id="start-solo-btn" class="btn-primary" style="margin-top:12px;width:auto;padding:12px 32px">
+          🏎️ Start Practice Now
+        </button>
+      </div>
+    </div>
+
+    <!-- Countdown Overlay -->
+    <div id="countdown-overlay" class="hidden">
+      <div class="countdown-inner">
+        <div id="countdown-num">3</div>
+        <div class="countdown-label">GET READY</div>
+      </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="game-canvas" class="hidden"></canvas>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div class="hud-top">
+        <div class="hud-pill" id="hud-lap">LAP <span id="lap-num">1</span>/<span id="lap-total">3</span></div>
+        <div class="hud-pill hud-pos" id="hud-pos">P<span id="pos-num">1</span></div>
+        <div class="hud-pill" id="hud-timer"><span id="race-timer">0:00.000</span></div>
+      </div>
+      <div class="hud-speed-wrap">
+        <div class="hud-speed" id="speed-display">0</div>
+        <div class="hud-speed-unit">km/h</div>
+      </div>
+      <div id="leaderboard-panel" class="leaderboard-panel"></div>
+      <div id="wrong-way" class="wrong-way hidden">⚠ WRONG WAY</div>
+
+      <!-- Controls hint — auto-fades after 6s -->
+      <div id="controls-hint" class="controls-hint">
+        <div class="ctrl-row"><kbd>W</kbd> / <kbd>↑</kbd> Accelerate</div>
+        <div class="ctrl-row"><kbd>S</kbd> / <kbd>↓</kbd> Brake</div>
+        <div class="ctrl-row"><kbd>A</kbd> / <kbd>←</kbd> <kbd>D</kbd> / <kbd>→</kbd> Steer</div>
+      </div>
+    </div>
+
+
+    <!-- Finish Screen -->
+    <div id="finish-screen" class="hidden">
+      <div class="finish-inner">
+        <div class="finish-title">🏁 RACE COMPLETE</div>
+        <div id="finish-podium" class="finish-podium"></div>
+        <div id="finish-standings" class="finish-standings"></div>
+        <div id="finish-cta" class="finish-cta"></div>
+        <button id="race-again-btn" class="btn-primary">🔄 Race Again</button>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

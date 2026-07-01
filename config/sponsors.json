@@ -1,0 +1,44 @@
+{
+  "track_id": "city_circuit_01",
+  "billboards": [
+    {
+      "brand": "LeadgerAI",
+      "image_url": "/assets/brands/demo/billboard.png",
+      "position": [-50, 8, -60],
+      "rotation": 0.5,
+      "label": "LEADGER AI\nThe Future of Intelligence"
+    },
+    {
+      "brand": "NeonFuel",
+      "image_url": "/assets/brands/demo2/billboard.png",
+      "position": [220, 8, -180],
+      "rotation": -1.57,
+      "label": "NEON FUEL\nPower Your Race"
+    },
+    {
+      "brand": "LeadgerAI",
+      "image_url": "/assets/brands/demo/billboard.png",
+      "position": [50, 8, -358],
+      "rotation": 0.0,
+      "label": "LEADGER AI\nAccelerate Your Stack"
+    },
+    {
+      "brand": "NeonFuel",
+      "image_url": "/assets/brands/demo2/billboard.png",
+      "position": [-155, 8, -180],
+      "rotation": -1.6,
+      "label": "NEON FUEL\nAll-In Racing"
+    }
+  ],
+  "start_arch": {
+    "brand": "LeadgerAI",
+    "logo_url": "/assets/brands/demo/arch_logo.png",
+    "label": "LEADGER AI"
+  },
+  "finish_cta": {
+    "brand": "LeadgerAI",
+    "text": "Race brought to you by LeadgerAI — Accelerate your stack",
+    "url": "https://leadger.ai"
+  },
+  "car_skins": []
+}
