@@ -113,7 +113,7 @@ function broadcastStats() {
 }
 
 // Fallback to frontend index for any unknown routes (SPA support)
-app.get('/(.*)', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
