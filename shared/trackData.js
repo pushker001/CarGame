@@ -10,7 +10,7 @@ export const TRACK_POINTS = [
   [300, 0, -50],     // Chicane right
   [260, 0, 0],       // Chicane left
   [150, 0, 80],      // Hairpin / sweep
-  [50, 0, 80],       // Return straight
+  [0, 0, 80],        // Return straight (perfectly aligned with Z axis)
   [0, 0, 0]          // Back to start
 ];
 
@@ -23,7 +23,7 @@ export const CHECKPOINTS = [
   { id: 3, pos: [260, 0, -250],   radius: 65 },
   { id: 4, pos: [260, 0, -50],    radius: 65 },
   { id: 5, pos: [150, 0, 80],     radius: 65 },
-  { id: 6, pos: [50, 0, 30],      radius: 65 },
+  { id: 6, pos: [0, 0, 40],       radius: 65 },
 ];
 
 export const TOTAL_LAPS = 3;
