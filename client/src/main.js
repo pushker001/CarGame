@@ -371,7 +371,39 @@ async function main() {
     showFinishScreen(s, myId, raceAgain);
   });
 
+  function setupMobileControls() {
+    const binds = {
+      'btn-up': 'ArrowUp',
+      'btn-down': 'ArrowDown',
+      'btn-left': 'ArrowLeft',
+      'btn-right': 'ArrowRight'
+    };
+    
+    for (const [id, key] of Object.entries(binds)) {
+      const btn = document.getElementById(id);
+      if (!btn) continue;
+      
+      const press = (e) => {
+        if (e.cancelable) e.preventDefault();
+        btn.classList.add('active');
+        if (playerCar) playerCar.keys[key] = true;
+      };
+      const release = (e) => {
+        if (e.cancelable) e.preventDefault();
+        btn.classList.remove('active');
+        if (playerCar) playerCar.keys[key] = false;
+      };
+      
+      btn.addEventListener('touchstart', press, {passive: false});
+      btn.addEventListener('mousedown', press);
+      btn.addEventListener('touchend', release, {passive: false});
+      btn.addEventListener('mouseup', release);
+      btn.addEventListener('mouseleave', release);
+    }
+  }
+
   // ── Start game loop ──
+  setupMobileControls();
   startGameLoop();
 
   // ── Init lobby ──
