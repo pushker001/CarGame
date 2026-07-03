@@ -4,29 +4,29 @@
     {
       "brand": "LeadgerAI",
       "image_url": "/assets/brands/demo/billboard.png",
-      "position": [-50, 8, -60],
-      "rotation": 0.5,
+      "position": [0, 8, -280],
+      "rotation": 0.0,
       "label": "LEADGER AI\nThe Future of Intelligence"
     },
     {
       "brand": "NeonFuel",
       "image_url": "/assets/brands/demo2/billboard.png",
-      "position": [220, 8, -180],
+      "position": [280, 8, -250],
       "rotation": -1.57,
       "label": "NEON FUEL\nPower Your Race"
     },
     {
       "brand": "LeadgerAI",
       "image_url": "/assets/brands/demo/billboard.png",
-      "position": [50, 8, -358],
-      "rotation": 0.0,
+      "position": [320, 8, -50],
+      "rotation": -1.57,
       "label": "LEADGER AI\nAccelerate Your Stack"
     },
     {
       "brand": "NeonFuel",
       "image_url": "/assets/brands/demo2/billboard.png",
-      "position": [-155, 8, -180],
-      "rotation": -1.6,
+      "position": [150, 8, 100],
+      "rotation": 3.14,
       "label": "NEON FUEL\nAll-In Racing"
     }
   ],

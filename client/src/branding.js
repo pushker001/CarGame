@@ -10,33 +10,30 @@ function loadBillboards(scene, curve) {
   for (const bb of sponsorsConfig.billboards) {
     const group = new THREE.Group();
 
-    // 1. The Massive Screen
-    const screenW = 40;
-    const screenH = 20;
+    // 1. The Screen
+    const screenW = 20;
+    const screenH = 10;
     const panelGeo = new THREE.PlaneGeometry(screenW, screenH);
     const texture  = generateBillboardTexture(bb.label || bb.brand, bb.brand);
-    // Use BasicMaterial so it glows brightly in the dark
     const panelMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const panel    = new THREE.Mesh(panelGeo, panelMat);
-    // Lift the screen high up on the building
-    panel.position.y = 30;
-    // Push it slightly forward so it doesn't z-fight with the building
+    panel.position.y = 6;
     panel.position.z = 0.5;
     group.add(panel);
 
-    // 2. The Dark Skyscraper behind the screen
-    const bldgW = 44;
-    const bldgH = 80;
-    const bldgD = 44;
-    const bldgGeo = new THREE.BoxGeometry(bldgW, bldgH, bldgD);
-    const bldgMat = new THREE.MeshLambertMaterial({ color: 0x0f1522 }); // sleek dark steel
-    const bldg = new THREE.Mesh(bldgGeo, bldgMat);
-    bldg.position.y = bldgH / 2;
-    // Push the building back so its front face touches Z=0
-    bldg.position.z = -bldgD / 2; 
-    group.add(bldg);
+    // 2. Pillars
+    const pillarGeo = new THREE.CylinderGeometry(0.5, 0.5, 6, 8);
+    const pillarMat = new THREE.MeshLambertMaterial({ color: 0x555555 });
+    
+    const p1 = new THREE.Mesh(pillarGeo, pillarMat);
+    p1.position.set(-8, 3, 0.2);
+    group.add(p1);
+    
+    const p2 = new THREE.Mesh(pillarGeo, pillarMat);
+    p2.position.set(8, 3, 0.2);
+    group.add(p2);
 
-    // Position and rotation of the entire building complex
+    // Position and rotation of the entire billboard
     group.position.set(...bb.position);
     group.rotation.y = bb.rotation || 0;
     scene.add(group);

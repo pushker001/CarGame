@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import { TRACK_POINTS, TRACK_WIDTH } from '../../shared/trackData.js';
 
-const ROAD_COLOR    = 0x3a3a4a;
-const CURB_A_COLOR  = 0xdd2222;
-const CURB_B_COLOR  = 0xffffff;
+const ROAD_COLOR    = 0x222222; // darker asphalt
+const CURB_A_COLOR  = 0xff0000; // red
+const CURB_B_COLOR  = 0xffffff; // white
 const MARK_COLOR    = 0xffffff;
-const BUILDING_PALLETE = [0x111118, 0x161622, 0x0f1522, 0x1a1a24, 0x1f1f2e]; // sleek dark glass/steel
-const GROUND_COLOR  = 0x0f0f1a; // dark ground
+const GROUND_COLOR  = 0x3a7d44; // grass green
 
 export function buildTrack(scene) {
   const pts = TRACK_POINTS.map(p => new THREE.Vector3(...p));
@@ -15,7 +14,7 @@ export function buildTrack(scene) {
   const roadGroup = new THREE.Group();
 
   // ── Road surface ──────────────────────────────────────────
-  const roadSegments = 200;
+  const roadSegments = 300; // higher res for sweeping corners
   const halfW = TRACK_WIDTH / 2;
   const positions = [];
   const uvs = [];
@@ -51,17 +50,14 @@ export function buildTrack(scene) {
   roadMesh.receiveShadow = true;
   roadGroup.add(roadMesh);
 
-  // ── Dashed center line ────────────────────────────────────
-  buildDashes(curve, roadSegments, roadGroup);
-
-  // ── Curbs (striped edges) ─────────────────────────────────
+  // ── Curbs (red/white striped edges) ───────────────────────
   buildCurbs(curve, roadSegments, halfW, roadGroup);
 
-  // ── Barriers ─────────────────────────────────────────────
+  // ── Barriers (tire walls / armco) ─────────────────────────
   buildBarriers(curve, roadSegments, halfW, roadGroup);
 
-  // ── Ground plane ──────────────────────────────────────────
-  const groundGeo = new THREE.PlaneGeometry(800, 800);
+  // ── Ground plane (Grass) ──────────────────────────────────
+  const groundGeo = new THREE.PlaneGeometry(2000, 2000);
   const groundMat = new THREE.MeshLambertMaterial({ color: GROUND_COLOR });
   const ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI / 2;
@@ -69,33 +65,20 @@ export function buildTrack(scene) {
   ground.receiveShadow = true;
   roadGroup.add(ground);
 
-  // ── City buildings ────────────────────────────────────────
-  buildCity(curve, roadSegments, halfW, roadGroup);
+  // ── Visual Pit Lane ───────────────────────────────────────
+  buildPitLane(curve, halfW, roadGroup);
 
-  // ── Lamp posts ────────────────────────────────────────────
-  buildLamps(curve, roadSegments, halfW, roadGroup);
+  // ── Grandstands ───────────────────────────────────────────
+  buildGrandstands(curve, halfW, roadGroup);
+
+  // ── Gravel Traps ──────────────────────────────────────────
+  buildGravelTraps(curve, roadSegments, halfW, roadGroup);
 
   // ── Start/Finish line ─────────────────────────────────────
   buildStartLine(curve, halfW, roadGroup);
 
   scene.add(roadGroup);
   return { curve };
-}
-
-function buildDashes(curve, segs, group) {
-  const mat = new THREE.MeshLambertMaterial({ color: MARK_COLOR });
-  for (let i = 0; i < segs; i += 8) {
-    const t0 = i / segs;
-    const t1 = (i + 3) / segs;
-    const pts = [];
-    for (let s = 0; s <= 4; s++) {
-      pts.push(curve.getPointAt(THREE.MathUtils.lerp(t0, t1, s / 4)));
-    }
-    const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 4, 0.25, 4, false);
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.y = 0.02;
-    group.add(mesh);
-  }
 }
 
 function buildCurbs(curve, segs, halfW, group) {
@@ -106,15 +89,19 @@ function buildCurbs(curve, segs, halfW, group) {
     for (let i = 0; i < segs; i++) {
       const t = i / segs;
       const pt = curve.getPointAt(t);
+      
+      // Only place curbs on tighter corners (curvature check could be added, but placing everywhere is fine for v1 arcade feel)
+      // We'll space them out nicely
+      
       const tg = curve.getTangentAt(t).normalize();
       const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
       const edge = pt.clone().addScaledVector(right, side * (halfW + 0.5));
 
       const mat = i % 4 < 2 ? matA : matB;
-      const geo = new THREE.BoxGeometry(3, 0.4, 1.2);
+      const geo = new THREE.BoxGeometry(3, 0.1, 1.2);
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.copy(edge);
-      mesh.position.y = 0.2;
+      mesh.position.y = 0.05;
       mesh.lookAt(edge.clone().add(tg));
       group.add(mesh);
     }
@@ -122,7 +109,7 @@ function buildCurbs(curve, segs, halfW, group) {
 }
 
 function buildBarriers(curve, segs, halfW, group) {
-  const mat = new THREE.MeshLambertMaterial({ color: 0x888899 });
+  const mat = new THREE.MeshLambertMaterial({ color: 0xcccccc }); // Armco steel barrier color
   const step = 6;
   for (let side = -1; side <= 1; side += 2) {
     for (let i = 0; i < segs; i += step) {
@@ -130,99 +117,108 @@ function buildBarriers(curve, segs, halfW, group) {
       const pt = curve.getPointAt(t);
       const tg = curve.getTangentAt(t).normalize();
       const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
-      const edge = pt.clone().addScaledVector(right, side * (halfW + 2.5));
+      // Push barriers further back to allow for runoff
+      const edge = pt.clone().addScaledVector(right, side * (halfW + 15));
 
-      const geo = new THREE.BoxGeometry(5, 1.0, 0.5);
+      const geo = new THREE.BoxGeometry(10, 1.2, 0.5);
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.copy(edge);
-      mesh.position.y = 0.5;
+      mesh.position.y = 0.6;
       mesh.lookAt(edge.clone().add(tg));
       group.add(mesh);
     }
   }
 }
 
-function buildCity(curve, segs, halfW, group) {
-  const rng = seeder(42);
-  const placedPositions = [];
-
-  for (let i = 0; i < segs; i += 5) {
-    for (let side = -1; side <= 1; side += 2) {
-      const t = i / segs;
-      const pt = curve.getPointAt(t);
-      const tg = curve.getTangentAt(t).normalize();
-      const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
-
-      const dist = halfW + 8 + rng() * 12;
-      const bPos = pt.clone().addScaledVector(right, side * dist);
-      bPos.x += (rng() - 0.5) * 8;
-      bPos.z += (rng() - 0.5) * 8;
-
-      // Check overlap
-      let ok = true;
-      for (const p of placedPositions) {
-        if (bPos.distanceTo(p) < 8) { ok = false; break; }
-      }
-      if (!ok) continue;
-      placedPositions.push(bPos.clone());
-
-      const w = 6  + rng() * 12;
-      const d = 6  + rng() * 12;
-      const h = 10 + rng() * 60;
-      const col = BUILDING_PALLETE[Math.floor(rng() * BUILDING_PALLETE.length)];
-
-      const geo = new THREE.BoxGeometry(w, h, d);
-      const mat = new THREE.MeshLambertMaterial({ color: col });
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.position.set(bPos.x, h / 2, bPos.z);
-      group.add(mesh);
-
-      // Window glow strips
-      addWindowGlows(mesh, w, h, d, group);
-    }
+function buildPitLane(curve, halfW, group) {
+  // Pit lane parallel to the start/finish straight (t=0 to t=0.1)
+  const pitMat = new THREE.MeshLambertMaterial({ color: ROAD_COLOR });
+  const segments = 20;
+  
+  for (let i = 0; i < segments; i++) {
+    const t = (i / segments) * 0.1; // Only first 10% of track
+    if (t > 0.08 && t < 0.09) continue; // exit blend
+    
+    const pt = curve.getPointAt(t);
+    const tg = curve.getTangentAt(t).normalize();
+    const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
+    
+    // Position pit lane to the right
+    const pitPos = pt.clone().addScaledVector(right, halfW + 10);
+    
+    const geo = new THREE.PlaneGeometry(15, 6);
+    const mesh = new THREE.Mesh(geo, pitMat);
+    mesh.position.copy(pitPos);
+    mesh.position.y = 0.01;
+    mesh.rotation.x = -Math.PI / 2;
+    // Align with track tangent
+    const lookTarget = pitPos.clone().add(tg);
+    lookTarget.y = 0.01;
+    mesh.lookAt(lookTarget);
+    group.add(mesh);
   }
 }
 
-function addWindowGlows(building, w, h, d, group) {
-  const glowMat = new THREE.MeshBasicMaterial({ color: 0xffffaa, transparent: true, opacity: 0.6 });
-  const rows = Math.floor(h / 4);
-  for (let r = 1; r < rows; r++) {
-    const geo = new THREE.PlaneGeometry(w * 0.7, 0.6);
-    const p = new THREE.Mesh(geo, glowMat);
-    p.position.set(
-      building.position.x,
-      r * (h / rows),
-      building.position.z + d / 2 + 0.1
-    );
-    group.add(p);
+function buildGrandstands(curve, halfW, group) {
+  const standMat = new THREE.MeshLambertMaterial({ color: 0x999999 });
+  const seatMat = new THREE.MeshLambertMaterial({ color: 0x224488 });
+  
+  // Place grandstands along the main straight (t = 0.02 to 0.08)
+  for (let i = 0.02; i <= 0.08; i += 0.02) {
+    const pt = curve.getPointAt(i);
+    const tg = curve.getTangentAt(i).normalize();
+    const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
+    
+    // Left side of track
+    const standPos = pt.clone().addScaledVector(right, -halfW - 25);
+    
+    const baseGeo = new THREE.BoxGeometry(40, 5, 10);
+    const base = new THREE.Mesh(baseGeo, standMat);
+    base.position.copy(standPos);
+    base.position.y = 2.5;
+    
+    // Look at track
+    const lookTarget = standPos.clone().add(tg);
+    base.lookAt(lookTarget);
+    
+    // Add tiered seating
+    for (let s = 1; s <= 4; s++) {
+      const tier = new THREE.Mesh(new THREE.BoxGeometry(38, 1, 2), seatMat);
+      tier.position.set(0, 2.5 + s, -5 + s*2);
+      base.add(tier);
+    }
+    
+    group.add(base);
   }
 }
 
-function buildLamps(curve, segs, halfW, group) {
-  const poleMat  = new THREE.MeshLambertMaterial({ color: 0x555566 });
-  const lightMat = new THREE.MeshBasicMaterial({ color: 0xffffdd });
-
-  for (let i = 0; i < segs; i += 12) {
-    for (let side = -1; side <= 1; side += 2) {
-      const t = i / segs;
-      const pt = curve.getPointAt(t);
-      const tg = curve.getTangentAt(t).normalize();
-      const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
-      const lPos = pt.clone().addScaledVector(right, side * (halfW + 1.5));
-
-      const poleGeo = new THREE.CylinderGeometry(0.1, 0.1, 7, 5);
-      const pole = new THREE.Mesh(poleGeo, poleMat);
-      pole.position.copy(lPos);
-      pole.position.y = 3.5;
-      group.add(pole);
-
-      const headGeo = new THREE.SphereGeometry(0.4, 6, 6);
-      const head = new THREE.Mesh(headGeo, lightMat);
-      head.position.copy(lPos);
-      head.position.y = 7.2;
-      group.add(head);
-    }
-  }
+function buildGravelTraps(curve, segs, halfW, group) {
+  const gravelMat = new THREE.MeshLambertMaterial({ color: 0xd2b48c }); // tan/sand color
+  
+  // Just place a few large flat planes at corner apexes for visuals
+  // E.g., t = 0.2, 0.4, 0.6, 0.8
+  const trapPoints = [0.15, 0.35, 0.55, 0.75, 0.85];
+  
+  trapPoints.forEach(t => {
+    const pt = curve.getPointAt(t);
+    const tg = curve.getTangentAt(t).normalize();
+    const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0)).normalize();
+    
+    // Outside of the corner (we just guess 'right' side here, for simplicity we place on both sides or just one)
+    const trapPos = pt.clone().addScaledVector(right, halfW + 10);
+    
+    const geo = new THREE.PlaneGeometry(40, 30);
+    const mesh = new THREE.Mesh(geo, gravelMat);
+    mesh.position.copy(trapPos);
+    mesh.position.y = 0.02;
+    mesh.rotation.x = -Math.PI / 2;
+    
+    const lookTarget = trapPos.clone().add(tg);
+    lookTarget.y = 0.02;
+    mesh.lookAt(lookTarget);
+    
+    group.add(mesh);
+  });
 }
 
 function buildStartLine(curve, halfW, group) {

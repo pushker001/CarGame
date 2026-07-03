@@ -221,54 +221,95 @@ export class Car {
 export function buildCarMesh(color = 0x00f5d4) {
   const group = new THREE.Group();
 
-  // Chassis
-  const chassisGeo = new THREE.BoxGeometry(2.0, 0.6, 4.0);
+  // F1 Main Chassis / Nosecone
+  const chassisGeo = new THREE.BoxGeometry(0.8, 0.4, 4.5);
   const chassisMat = new THREE.MeshLambertMaterial({ color });
   const chassis = new THREE.Mesh(chassisGeo, chassisMat);
-  chassis.position.y = 0;
+  chassis.position.y = 0.2;
   group.add(chassis);
 
-  // Cab
-  const cabGeo = new THREE.BoxGeometry(1.6, 0.6, 2.0);
-  const cabMat = new THREE.MeshLambertMaterial({ color });
-  const cab = new THREE.Mesh(cabGeo, cabMat);
-  cab.position.set(0, 0.6, -0.2);
-  chassis.add(cab);
+  // Cockpit area
+  const cockpitGeo = new THREE.BoxGeometry(0.9, 0.5, 1.5);
+  const cockpit = new THREE.Mesh(cockpitGeo, chassisMat);
+  cockpit.position.set(0, 0.25, -0.2);
+  chassis.add(cockpit);
 
-  // Windshield tint
-  const wGeo = new THREE.BoxGeometry(1.5, 0.5, 0.1);
-  const wMat = new THREE.MeshLambertMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
-  const wind = new THREE.Mesh(wGeo, wMat);
-  wind.position.set(0, 0.05, 0.95);
-  cab.add(wind);
+  // Driver Helmet (simple black sphere)
+  const helmetGeo = new THREE.SphereGeometry(0.2, 8, 8);
+  const helmetMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+  const helmet = new THREE.Mesh(helmetGeo, helmetMat);
+  helmet.position.set(0, 0.5, 0.1);
+  cockpit.add(helmet);
 
-  // Spoiler
-  const spoilerGeo = new THREE.BoxGeometry(1.8, 0.1, 0.4);
-  const spoilerMat = new THREE.MeshLambertMaterial({ color: darken(color, 0.5) });
-  const spoiler = new THREE.Mesh(spoilerGeo, spoilerMat);
-  spoiler.position.set(0, 0.45, -1.1);
-  chassis.add(spoiler);
+  // Front Wing
+  const fWingGeo = new THREE.BoxGeometry(2.2, 0.05, 0.6);
+  const fWing = new THREE.Mesh(fWingGeo, chassisMat);
+  fWing.position.set(0, -0.1, 2.2);
+  chassis.add(fWing);
+  
+  // Front Wing Sideplates
+  const fPlateGeo = new THREE.BoxGeometry(0.05, 0.3, 0.6);
+  const fPlateL = new THREE.Mesh(fPlateGeo, chassisMat);
+  fPlateL.position.set(1.1, 0.1, 0);
+  fWing.add(fPlateL);
+  const fPlateR = new THREE.Mesh(fPlateGeo, chassisMat);
+  fPlateR.position.set(-1.1, 0.1, 0);
+  fWing.add(fPlateR);
 
-  // Wheels
+  // Rear Wing
+  const rWingGeo = new THREE.BoxGeometry(2.0, 0.05, 0.6);
+  const rWing = new THREE.Mesh(rWingGeo, chassisMat);
+  rWing.position.set(0, 0.6, -2.0);
+  chassis.add(rWing);
+  
+  // Rear Wing Pillars
+  const pillarGeo = new THREE.BoxGeometry(0.1, 0.6, 0.2);
+  const pillarMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+  const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+  pillar.position.set(0, -0.3, 0);
+  rWing.add(pillar);
+  
+  // Rear Wing Sideplates
+  const rPlateGeo = new THREE.BoxGeometry(0.05, 0.6, 0.8);
+  const rPlateL = new THREE.Mesh(rPlateGeo, chassisMat);
+  rPlateL.position.set(1.0, -0.1, 0);
+  rWing.add(rPlateL);
+  const rPlateR = new THREE.Mesh(rPlateGeo, chassisMat);
+  rPlateR.position.set(-1.0, -0.1, 0);
+  rWing.add(rPlateR);
+
+  // Wheels (Exposed, Open-Wheel style)
   const wheels = [];
-  const wheelMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+  const wheelMat = new THREE.MeshLambertMaterial({ color: 0x181818 }); // dark rubber
   const rimMat   = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
-  const wPositions = [
-    [-1.2, -0.1,  1.3],
-    [ 1.2, -0.1,  1.3],
-    [-1.2, -0.1, -1.3],
-    [ 1.2, -0.1, -1.3],
+  // Front wheels (slightly narrower), Rear wheels (wider)
+  const wSpecs = [
+    { x: -0.9, y: 0.1, z:  1.6, w: 0.3, r: 0.4 }, // FL
+    { x:  0.9, y: 0.1, z:  1.6, w: 0.3, r: 0.4 }, // FR
+    { x: -0.9, y: 0.1, z: -1.7, w: 0.4, r: 0.45 }, // RL
+    { x:  0.9, y: 0.1, z: -1.7, w: 0.4, r: 0.45 }, // RR
   ];
-  for (const [wx, wy, wz] of wPositions) {
-    const wGeo = new THREE.CylinderGeometry(0.38, 0.38, 0.32, 12);
+  
+  for (const spec of wSpecs) {
+    const wGeo = new THREE.CylinderGeometry(spec.r, spec.r, spec.w, 16);
     const wheel = new THREE.Mesh(wGeo, wheelMat);
     wheel.rotation.z = Math.PI / 2;
-    wheel.position.set(wx, wy, wz);
+    wheel.position.set(spec.x, spec.y, spec.z);
 
-    const rimGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.34, 8);
+    const rimGeo = new THREE.CylinderGeometry(spec.r * 0.5, spec.r * 0.5, spec.w + 0.02, 8);
     const rim = new THREE.Mesh(rimGeo, rimMat);
     rim.rotation.z = Math.PI / 2;
+    // Fix rim rotation relative to wheel (cylinder inside cylinder)
+    rim.rotation.set(0, 0, 0);
     wheel.add(rim);
+
+    // Axle (visual strut connecting wheel to chassis)
+    const axleGeo = new THREE.CylinderGeometry(0.05, 0.05, Math.abs(spec.x) - 0.4, 4);
+    const axle = new THREE.Mesh(axleGeo, pillarMat);
+    axle.rotation.z = Math.PI / 2;
+    // Axle is child of chassis, pointing to wheel
+    axle.position.set(Math.sign(spec.x) * ((Math.abs(spec.x) - 0.4) / 2 + 0.4), spec.y, spec.z);
+    chassis.add(axle);
 
     chassis.add(wheel);
     wheels.push(wheel);

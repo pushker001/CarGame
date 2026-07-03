@@ -38,8 +38,8 @@ let colorIndex = 0;
 // ── Scene Setup ───────────────────────────────────────────
 function initScene() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a1e); // dark night sky
-  scene.fog = new THREE.Fog(0x0a0a1e, 120, 600); 
+  scene.background = new THREE.Color(0x87ceeb); // bright daylight sky
+  scene.fog = new THREE.Fog(0x87ceeb, 200, 800); 
 
   renderer = new THREE.WebGLRenderer({
     canvas: document.getElementById('game-canvas'),
@@ -54,18 +54,15 @@ function initScene() {
 
   clock = new THREE.Clock();
 
-  // Lighting — dark neon night
-  const sun = new THREE.DirectionalLight(0xffe8b5, 1.4);
+  // Lighting — daylight
+  const sun = new THREE.DirectionalLight(0xffffff, 1.4);
   sun.position.set(80, 120, 60);
   sun.castShadow = true;
   scene.add(sun);
-  const ambient = new THREE.AmbientLight(0x1a1a3a, 0.9); // dark ambient
+  const ambient = new THREE.AmbientLight(0xffffff, 0.4); // bright ambient
   scene.add(ambient);
-  const fill = new THREE.HemisphereLight(0x1a3a5c, 0x0a0a1e, 0.5); // night bounce
+  const fill = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6); // sky/ground bounce
   scene.add(fill);
-
-  // Skybox stars
-  buildStars();
 
   // Resize handler
   window.addEventListener('resize', () => {
@@ -80,20 +77,6 @@ function initScene() {
   canvas.addEventListener('click', () => canvas.focus());
 }
 
-function buildStars() {
-  const geo = new THREE.BufferGeometry();
-  const verts = [];
-  for (let i = 0; i < 2000; i++) {
-    verts.push(
-      (Math.random() - 0.5) * 800,
-      Math.random() * 200 + 20,
-      (Math.random() - 0.5) * 800
-    );
-  }
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-  const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.4 });
-  scene.add(new THREE.Points(geo, mat));
-}
 
 // ── Game Loop ─────────────────────────────────────────────
 function startGameLoop() {
