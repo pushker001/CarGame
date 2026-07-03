@@ -94,7 +94,7 @@ export class ChaseCamera {
     const currentAbove = OFFSET_ABOVE + this.orbitPitch * 5;
 
     this._tmpPos.copy(carPos)
-      .addScaledVector(behindDir, OFFSET_BEHIND)
+      .addScaledVector(behindDir, -OFFSET_BEHIND)
       .setY(carPos.y + currentAbove);
 
     // Lerp camera position
