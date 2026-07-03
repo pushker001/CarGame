@@ -397,6 +397,7 @@ async function main() {
       btn.addEventListener('touchstart', press, {passive: false});
       btn.addEventListener('mousedown', press);
       btn.addEventListener('touchend', release, {passive: false});
+      btn.addEventListener('touchcancel', release, {passive: false});
       btn.addEventListener('mouseup', release);
       btn.addEventListener('mouseleave', release);
     }

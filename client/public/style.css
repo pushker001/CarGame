@@ -628,6 +628,7 @@ kbd {
   gap: 10px;
   z-index: 9999;
   user-select: none;
+  pointer-events: auto; /* Re-enable pointer events since HUD disables them */
 }
 
 .mobile-ctrl-row {
@@ -650,7 +651,7 @@ kbd {
   backdrop-filter: blur(10px);
   cursor: pointer;
   user-select: none;
-  touch-action: manipulation;
+  touch-action: none; /* Prevent all browser gestures (zoom/scroll) on buttons */
   transition: background 0.1s;
 }
 
