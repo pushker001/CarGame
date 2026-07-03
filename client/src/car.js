@@ -21,6 +21,7 @@ export class Car {
     this.wrongWay     = false;
     this.lastCheckpointDir = 1;
     this.trackCurve   = null; // set externally after construction
+    this.hasStartedRace = false;
 
     this.velocity = new THREE.Vector3(); // lateral physics
 
@@ -176,14 +177,15 @@ export class Car {
         const lapTime = (now - this.lapStart) / 1000;
         
         // The car spawns inside checkpoint 0, so the first hit happens at time=0.
-        // We only count it as a lap if they've been driving for a bit.
-        if (lapTime > 2.0) {
+        // We only count it as a lap if they've been driving for a bit and already crossed the line once.
+        if (lapTime > 2.0 && this.hasStartedRace) {
           this.lapTimes.push(lapTime);
           this.lapCount++;
           this.lapStart = now;
         } else {
           // Reset lap start to exact moment they cleared the start line
           this.lapStart = now;
+          this.hasStartedRace = true;
         }
       }
       
