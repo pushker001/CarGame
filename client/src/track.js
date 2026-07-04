@@ -177,9 +177,8 @@ function buildGrandstands(curve, halfW, group) {
     base.position.copy(standPos);
     base.position.y = 2.5;
     
-    // Look at track
-    const lookTarget = standPos.clone().add(tg);
-    base.lookAt(lookTarget);
+    // Look at track center (pt) instead of down the track
+    base.lookAt(pt);
     
     // Add tiered seating
     for (let s = 1; s <= 4; s++) {
@@ -213,9 +212,8 @@ function buildGravelTraps(curve, segs, halfW, group) {
     mesh.position.y = 0.02;
     mesh.rotation.x = -Math.PI / 2;
     
-    const lookTarget = trapPos.clone().add(tg);
-    lookTarget.y = 0.02;
-    mesh.lookAt(lookTarget);
+    // Rotate horizontally to align with the track tangent
+    mesh.rotation.z = Math.atan2(-tg.x, tg.z);
     
     group.add(mesh);
   });

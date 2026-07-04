@@ -149,8 +149,9 @@ export class Car {
       // Bounce: kill velocity component pointing outward
       const outDot = this.velocity.dot(pushDir);
       if (outDot > 0) {
-        this.velocity.addScaledVector(pushDir, -outDot * 1.5);
-        this.speed *= 0.45; // lose speed on impact
+        this.velocity.addScaledVector(pushDir, -outDot * 1.05); // slight bounce
+        // Set scalar speed to the remaining velocity magnitude
+        this.speed = Math.sign(this.speed) * this.velocity.length();
       }
     }
   }

@@ -83,9 +83,8 @@ function loadStartArch(scene, curve) {
   // Position at start line
   archGroup.position.copy(pt);
   archGroup.position.y = 0;
-  // Face perpendicular to track
-  const right = new THREE.Vector3().crossVectors(tg, new THREE.Vector3(0,1,0));
-  archGroup.lookAt(pt.clone().add(right));
+  // Face down the track
+  archGroup.lookAt(pt.clone().add(tg));
 
   scene.add(archGroup);
 }
