@@ -24,6 +24,10 @@ export function startHUDTimer() {
   _timerRAF = requestAnimationFrame(tick);
 }
 
+export function getRaceTime() {
+  return _raceStart ? performance.now() - _raceStart : 0;
+}
+
 export function stopHUDTimer() {
   cancelAnimationFrame(_timerRAF);
 }

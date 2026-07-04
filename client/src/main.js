@@ -3,7 +3,7 @@ import { buildTrack }           from './track.js';
 import { Car }                  from './car.js';
 import { RemoteCar }            from './remoteCar.js';
 import { ChaseCamera }          from './camera.js';
-import { updateHUD, updateLeaderboard, startHUDTimer, stopHUDTimer } from './hud.js';
+import { updateHUD, updateLeaderboard, startHUDTimer, stopHUDTimer, getRaceTime } from './hud.js';
 import { initLobby, hideLobby, showLobby, showToast } from './lobby.js';
 import { showFinishScreen, hideFinishScreen } from './finish.js';
 import { loadBranding }         from './branding.js';
@@ -112,7 +112,22 @@ function startGameLoop() {
       // Check lap completion
       if (playerCar.lapCount >= TOTAL_LAPS && !playerCar.finished) {
         playerCar.finished = true;
-        Net.send('race_finish', { totalTime: Date.now() });
+        
+        if (myId && myId.startsWith('solo_')) {
+          raceStarted = false;
+          canDrive = false;
+          stopHUDTimer();
+          
+          const fakeStandings = [{
+            id: myId,
+            name: myName,
+            color: myColor,
+            totalTime: getRaceTime()
+          }];
+          showFinishScreen(fakeStandings, myId);
+        } else {
+          Net.send('race_finish', { totalTime: Date.now() });
+        }
       }
     }
 
