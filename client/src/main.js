@@ -34,6 +34,7 @@ let updateInterval = null;
 let standings = [];
 let myPosition = 1;
 let colorIndex = 0;
+let isSoloMode = false;
 
 // ── Scene Setup ───────────────────────────────────────────
 function initScene() {
@@ -112,19 +113,19 @@ function startGameLoop() {
       // Check lap completion
       if (playerCar.lapCount >= TOTAL_LAPS && !playerCar.finished) {
         playerCar.finished = true;
-        
-        if (myId && myId.startsWith('solo_')) {
+
+        if (isSoloMode) {
+          // Solo: show finish screen immediately without waiting for server
           raceStarted = false;
           canDrive = false;
           stopHUDTimer();
-          
           const fakeStandings = [{
-            id: myId,
+            id: 'solo',
             name: myName,
             color: myColor,
             totalTime: getRaceTime()
           }];
-          showFinishScreen(fakeStandings, myId);
+          showFinishScreen(fakeStandings, 'solo');
         } else {
           Net.send('race_finish', { totalTime: Date.now() });
         }
@@ -207,6 +208,7 @@ function handleSoloJoin(name) {
   chaseCamera.snapTo(playerCar.mesh);
   canDrive = false;
   raceStarted = false;
+  isSoloMode = true;  // ← mark as solo so finish screen fires locally
 
   // Also tell server (so join feed still fires)
   Net.send('player_join', { name: myName, color: myColor });
