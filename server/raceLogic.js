@@ -21,10 +21,13 @@ export function validateCheckpoint(player, state) {
   const dist = Math.sqrt(dx*dx + dz*dz);
 
   if (dist <= cp.radius) {
+    const isLastCheckpoint = player.checkpoint === CHECKPOINTS.length - 1;
+
+    // Advance checkpoint
     player.checkpoint = (player.checkpoint + 1) % CHECKPOINTS.length;
 
-    // Completed a full lap?
-    if (player.checkpoint === 0) {
+    // Lap completed when passing the last checkpoint
+    if (isLastCheckpoint) {
       player.lap++;
       player.lapCompletedAt = Date.now();
     }

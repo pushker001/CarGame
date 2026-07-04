@@ -172,25 +172,26 @@ export class Car {
     const dist = pos.distanceTo(cpPos);
 
     if (dist < cp.radius) {
-      // Completed a lap? (Hitting checkpoint 0)
-      if (this.checkpoint === 0) {
+      const isLastCheckpoint = this.checkpoint === CHECKPOINTS.length - 1;
+
+      // Advance to next checkpoint (wraps to 0 after last)
+      this.checkpoint = (this.checkpoint + 1) % CHECKPOINTS.length;
+
+      // A lap is completed when we just passed the LAST checkpoint
+      // and are now wrapping back to checkpoint 0
+      if (isLastCheckpoint && this.hasStartedRace) {
         const now = performance.now();
         const lapTime = (now - this.lapStart) / 1000;
-        
-        // The car spawns inside checkpoint 0, so the first hit happens at time=0.
-        // We only count it as a lap if they've been driving for a bit and already crossed the line once.
-        if (lapTime > 2.0 && this.hasStartedRace) {
-          this.lapTimes.push(lapTime);
-          this.lapCount++;
-          this.lapStart = now;
-        } else {
-          // Reset lap start to exact moment they cleared the start line
-          this.lapStart = now;
-          this.hasStartedRace = true;
-        }
+        this.lapTimes.push(lapTime);
+        this.lapCount++;
+        this.lapStart = now;
       }
-      
-      this.checkpoint = (this.checkpoint + 1) % CHECKPOINTS.length;
+
+      // Mark race as started once we leave checkpoint 0
+      if (!this.hasStartedRace && this.checkpoint === 1) {
+        this.hasStartedRace = true;
+        this.lapStart = performance.now();
+      }
     }
   }
 
