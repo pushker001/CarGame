@@ -1,13 +1,13 @@
 // Race logic: checkpoint validation and lap counting server-side
 
 const CHECKPOINTS = [
-  { id: 0, pos: [0, 0, 0],        radius: 30 },
-  { id: 1, pos: [120, 0, -50],    radius: 25 },
-  { id: 2, pos: [200, 0, -180],   radius: 25 },
-  { id: 3, pos: [100, 0, -350],   radius: 25 },
-  { id: 4, pos: [-80, 0, -340],   radius: 25 },
-  { id: 5, pos: [-170, 0, -200],  radius: 25 },
-  { id: 6, pos: [-150, 0, -60],   radius: 25 },
+  { id: 0, pos: [0, 0, 0],        radius: 65 },  // Start/Finish
+  { id: 1, pos: [0, 0, -150],     radius: 65 },
+  { id: 2, pos: [80, 0, -330],    radius: 65 },
+  { id: 3, pos: [260, 0, -250],   radius: 65 },
+  { id: 4, pos: [260, 0, -50],    radius: 65 },
+  { id: 5, pos: [150, 0, 80],     radius: 65 },
+  { id: 6, pos: [0, 0, 40],       radius: 65 },
 ];
 
 export const TOTAL_LAPS = 3;
